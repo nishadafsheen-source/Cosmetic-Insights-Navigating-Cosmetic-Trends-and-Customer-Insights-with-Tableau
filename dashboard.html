@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cosmetic Insights Dashboard</title>
+  <style>
+    :root {
+      --bg: #f4efe8;
+      --panel: rgba(255, 255, 255, 0.82);
+      --panel-strong: #ffffff;
+      --text: #1d232f;
+      --muted: #667085;
+      --line: rgba(29, 35, 47, 0.1);
+      --accent: #c4543d;
+      --accent-2: #0f766e;
+      --accent-3: #7a5cff;
+      --accent-4: #d19b2b;
+      --shadow: 0 18px 50px rgba(31, 41, 55, 0.12);
+      --radius-xl: 28px;
+      --radius-lg: 20px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--text);
+      font-family: "Aptos", "Segoe UI", "Trebuchet MS", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(196, 84, 61, 0.14), transparent 35%),
+        radial-gradient(circle at top right, rgba(15, 118, 110, 0.13), transparent 32%),
+        linear-gradient(180deg, #fbf8f3 0%, #f4efe8 55%, #efe7dc 100%);
+      min-height: 100vh;
+    }
+
+    .wrap {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px;
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,0.5);
+      background: linear-gradient(135deg, rgba(255,255,255,0.88), rgba(255,255,255,0.72));
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 22px;
+      backdrop-filter: blur(16px);
+    }
+
+    .hero::after {
+      content: "";
+      position: absolute;
+      inset: auto -80px -90px auto;
+      width: 260px;
+      height: 260px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(196,84,61,0.22), rgba(196,84,61,0.02) 70%, transparent 75%);
+      pointer-events: none;
+    }
+
+    .eyebrow {
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      color: var(--accent);
+      font-size: 0.78rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 4vw, 3.4rem);
+      line-height: 1.02;
+    }
+
+    .subtitle {
+      max-width: 860px;
+      color: var(--muted);
+      margin: 12px 0 0;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+      position: relative;
+      z-index: 1;
+    }
+
+    .btn {
+      appearance: none;
+      border: 0;
+      border-radius: 999px;
+      padding: 12px 18px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+    }
+
+    .btn:hover { transform: translateY(-1px); }
+
+    .btn-primary {
+      color: #fff;
+      background: linear-gradient(135deg, var(--accent), #e06b4d);
+      box-shadow: 0 10px 24px rgba(196, 84, 61, 0.22);
+    }
+
+    .btn-secondary {
+      color: var(--text);
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(29, 35, 47, 0.08);
+    }
+
+    .btn-secondary.active {
+      background: rgba(15, 118, 110, 0.12);
+      border-color: rgba(15, 118, 110, 0.28);
+      color: var(--accent-2);
+    }
+
+    .grid-kpis {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 16px;
+      margin: 18px 0 22px;
+    }
+
+    .kpi {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-lg);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(10px);
+      min-height: 116px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      animation: rise 0.6s ease both;
+    }
+
+    .kpi-label {
+      color: var(--muted);
+      font-size: 0.86rem;
+      font-weight: 600;
+    }
+
+    .kpi-value {
+      font-size: clamp(1.5rem, 2.6vw, 2.3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+    }
+
+    .kpi-note {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: 1.2fr 1fr 1fr 1fr;
+      gap: 14px;
+      margin-bottom: 18px;
+    }
+
+    .control {
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .control label {
+      display: block;
+      font-size: 0.76rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+      color: var(--muted);
+    }
+
+    .control select {
+      width: 100%;
+      border: 0;
+      outline: none;
+      background: transparent;
+      color: var(--text);
+      font: inherit;
+      font-weight: 600;
+      padding-right: 8px;
+      cursor: pointer;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .panel-header {
+      padding: 18px 20px 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 12px;
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 1.1rem;
+    }
+
+    .panel-subtitle {
+      margin: 4px 0 0;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .panel-body {
+      padding: 8px 20px 20px;
+    }
+
+    .chart-wrap {
+      display: grid;
+      gap: 16px;
+    }
+
+    .chart-card {
+      background: rgba(255,255,255,0.74);
+      border: 1px solid rgba(29, 35, 47, 0.08);
+      border-radius: 18px;
+      padding: 16px;
+    }
+
+    .chart-card h3 {
+      margin: 0 0 10px;
+      font-size: 0.95rem;
+    }
+
+    svg {
+      width: 100%;
+      height: auto;
+      display: block;
+      overflow: visible;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 0.85rem;
+    }
+
+    .legend span {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .table-wrap {
+      margin-top: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 16px 18px 0;
+      flex-wrap: wrap;
+    }
+
+    .table-summary {
+      color: var(--muted);
+      font-size: 0.92rem;
+      font-weight: 600;
+    }
+
+    .page-controls {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-left: auto;
+    }
+
+    .page-btn {
+      width: 40px;
+      height: 40px;
+      border: 1px solid rgba(29,35,47,0.12);
+      background: rgba(255,255,255,0.92);
+      color: var(--text);
+      border-radius: 12px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform 0.2s ease, opacity 0.2s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      transform: translateY(-1px);
+    }
+
+    .page-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+
+    .page-label {
+      min-width: 110px;
+      text-align: center;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 0.9rem;
+    }
+
+    .insights {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .insight-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      padding: 18px 20px;
+    }
+
+    .insight-card h3 {
+      margin: 0 0 8px;
+      font-size: 0.95rem;
+    }
+
+    .insight-card p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.55;
+      font-size: 0.92rem;
+    }
+
+    .trend-panel {
+      margin-top: 18px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .trend-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 16px;
+      padding: 8px 20px 20px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.93rem;
+    }
+
+    thead th {
+      text-align: left;
+      padding: 16px 18px;
+      color: var(--muted);
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      background: rgba(255,255,255,0.7);
+      position: sticky;
+      top: 0;
+    }
+
+    tbody td {
+      padding: 14px 18px;
+      border-top: 1px solid rgba(29,35,47,0.08);
+      vertical-align: top;
+    }
+
+    tbody tr:hover {
+      background: rgba(196,84,61,0.04);
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      background: rgba(15,118,110,0.1);
+      color: var(--accent-2);
+      font-size: 0.8rem;
+      font-weight: 700;
+    }
+
+    .muted { color: var(--muted); }
+
+    .footer-note {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-top: 12px;
+    }
+
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 1180px) {
+      .grid-kpis { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .dashboard { grid-template-columns: 1fr; }
+      .insights { grid-template-columns: 1fr; }
+      .trend-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 720px) {
+      .wrap { padding: 16px; }
+      .grid-kpis { grid-template-columns: 1fr 1fr; }
+      .filters { grid-template-columns: 1fr; }
+      .panel-header { flex-direction: column; align-items: start; }
+      table { font-size: 0.84rem; }
+      thead th, tbody td { padding: 12px 12px; }
+      .table-toolbar { padding: 14px 12px 0; }
+      .page-controls { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="eyebrow">Cosmetic Insights</div>
+      <h1>Interactive Cosmetics Performance Dashboard</h1>
+      <p class="subtitle">A clean, presentation-ready dashboard for exploring brand performance, price bands, customer preference, and skin-type suitability across the cosmetics catalog.</p>
+      <div class="hero-actions">
+        <button class="btn btn-primary" id="resetFilters" type="button">Reset Filters</button>
+        <button class="btn btn-secondary" id="toggleNumbers" type="button">Expand Numbers</button>
+        <button class="btn btn-secondary" id="downloadCsv" type="button">Download CSV</button>
+      </div>
+    </section>
+
+    <section class="grid-kpis" id="kpis"></section>
+
+    <section class="filters">
+      <div class="control">
+        <label for="brandFilter">Brand</label>
+        <select id="brandFilter"></select>
+      </div>
+      <div class="control">
+        <label for="categoryFilter">Category</label>
+        <select id="categoryFilter"></select>
+      </div>
+      <div class="control">
+        <label for="skinFilter">Skin Type</label>
+        <select id="skinFilter"></select>
+      </div>
+      <div class="control">
+        <label for="priceFilter">Price Band</label>
+        <select id="priceFilter"></select>
+      </div>
+    </section>
+
+    <section class="dashboard">
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Market Overview</h2>
+            <p class="panel-subtitle">Category distribution and brand sales from the filtered dataset.</p>
+          </div>
+          <span class="tag" id="recordsTag">0 records</span>
+        </div>
+        <div class="panel-body chart-wrap">
+          <div class="chart-card">
+            <h3>Products by Category</h3>
+            <svg id="categoryChart" viewBox="0 0 760 280" aria-label="Products by category chart"></svg>
+            <div class="legend">
+              <span><i class="dot" style="background: var(--accent);"></i>Category count</span>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Top Brands by Sales</h3>
+            <svg id="brandChart" viewBox="0 0 760 300" aria-label="Top brands by sales chart"></svg>
+            <div class="legend">
+              <span><i class="dot" style="background: var(--accent-2);"></i>Total sales</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <div>
+            <h2 class="panel-title">Customer Preference</h2>
+            <p class="panel-subtitle">Ratings, review volume, and skin-type distribution.</p>
+          </div>
+        </div>
+        <div class="panel-body chart-wrap">
+          <div class="chart-card">
+            <h3>Skin-Type Suitability</h3>
+            <svg id="skinChart" viewBox="0 0 540 300" aria-label="Skin type chart"></svg>
+            <div class="legend">
+              <span><i class="dot" style="background: var(--accent-4);"></i>Filtered products</span>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3>Top Products by Rating</h3>
+            <svg id="ratingChart" viewBox="0 0 540 300" aria-label="Top products by rating chart"></svg>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="table-wrap">
+      <div class="table-toolbar">
+        <div class="table-summary" id="tableSummary">Showing 0 tuples</div>
+        <div class="page-controls">
+          <button class="page-btn" id="prevPage" type="button" aria-label="Previous page">&larr;</button>
+          <div class="page-label" id="pageInfo">Page 1 of 1</div>
+          <button class="page-btn" id="nextPage" type="button" aria-label="Next page">&rarr;</button>
+        </div>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Brand</th>
+            <th>Category</th>
+            <th>Skin Type</th>
+            <th>Price</th>
+            <th>Rating</th>
+            <th>Sales</th>
+          </tr>
+        </thead>
+        <tbody id="productTable"></tbody>
+      </table>
+    </section>
+
+    <section class="insights" id="insights"></section>
+
+    <section class="trend-panel">
+      <div class="panel-header">
+        <div>
+          <h2 class="panel-title">Trend Analysis</h2>
+          <p class="panel-subtitle">Launch-year sales trend and price-band mix from the filtered dataset.</p>
+        </div>
+      </div>
+      <div class="trend-grid">
+        <div class="chart-card">
+          <h3>Sales by Launch Year</h3>
+          <svg id="trendChart" viewBox="0 0 760 300" aria-label="Sales by launch year chart"></svg>
+        </div>
+        <div class="chart-card">
+          <h3>Price Band Mix</h3>
+          <svg id="priceBandChart" viewBox="0 0 620 300" aria-label="Price band chart"></svg>
+        </div>
+      </div>
+    </section>
+
+    <div class="footer-note">Prototype dashboard built from the sample cosmetics dataset. Replace the sample rows with your real source data for final submission.</div>
+  </div>
+
+  <script>
+    const fallbackData = [
+      { Product_ID: 1, Product_Name: "Glow Foundation", Brand: "Lumina", Category: "Makeup", Price: 28.5, Rating: 4.6, Reviews: 842, Sales_USD: 24500, Skin_Type: "Combination", Ingredient_Type: "Hydrating", Launch_Year: 2023, Country: "USA" },
+      { Product_ID: 2, Product_Name: "Velvet Lipstick", Brand: "Shade & Silk", Category: "Makeup", Price: 19.99, Rating: 4.4, Reviews: 651, Sales_USD: 19800, Skin_Type: "Dry", Ingredient_Type: "Matte Finish", Launch_Year: 2022, Country: "France" },
+      { Product_ID: 3, Product_Name: "Pure Cleanser", Brand: "DermaLeaf", Category: "Skincare", Price: 22, Rating: 4.7, Reviews: 910, Sales_USD: 30100, Skin_Type: "Sensitive", Ingredient_Type: "Gentle Care", Launch_Year: 2024, Country: "South Korea" },
+      { Product_ID: 4, Product_Name: "Hydra Serum", Brand: "AquaBloom", Category: "Skincare", Price: 35, Rating: 4.8, Reviews: 1030, Sales_USD: 41200, Skin_Type: "Dry", Ingredient_Type: "Vitamin C", Launch_Year: 2024, Country: "USA" },
+      { Product_ID: 5, Product_Name: "Soft Matte Powder", Brand: "Velora", Category: "Makeup", Price: 16.75, Rating: 4.2, Reviews: 430, Sales_USD: 15400, Skin_Type: "Oily", Ingredient_Type: "Oil-Control", Launch_Year: 2021, Country: "India" },
+      { Product_ID: 6, Product_Name: "Night Repair Cream", Brand: "DermaLeaf", Category: "Skincare", Price: 39.99, Rating: 4.9, Reviews: 1250, Sales_USD: 46800, Skin_Type: "Normal", Ingredient_Type: "Retinol", Launch_Year: 2023, Country: "South Korea" },
+      { Product_ID: 7, Product_Name: "Silk Mascara", Brand: "Lumina", Category: "Makeup", Price: 14.5, Rating: 4.1, Reviews: 389, Sales_USD: 13650, Skin_Type: "Sensitive", Ingredient_Type: "Fragrance-Free", Launch_Year: 2020, Country: "USA" },
+      { Product_ID: 8, Product_Name: "Fresh Toner", Brand: "AquaBloom", Category: "Skincare", Price: 18.25, Rating: 4.5, Reviews: 720, Sales_USD: 20900, Skin_Type: "Oily", Ingredient_Type: "Balancing", Launch_Year: 2022, Country: "Japan" },
+      { Product_ID: 9, Product_Name: "Radiant Blush", Brand: "Shade & Silk", Category: "Makeup", Price: 21.4, Rating: 4.3, Reviews: 540, Sales_USD: 17600, Skin_Type: "Combination", Ingredient_Type: "Long-Wear", Launch_Year: 2023, Country: "France" },
+      { Product_ID: 10, Product_Name: "Daily Sunscreen", Brand: "SunGuard", Category: "Skincare", Price: 27, Rating: 4.8, Reviews: 980, Sales_USD: 38900, Skin_Type: "All Skin Types", Ingredient_Type: "SPF", Launch_Year: 2024, Country: "Australia" },
+      { Product_ID: 11, Product_Name: "Herbal Shampoo", Brand: "GlowRoot", Category: "Haircare", Price: 24, Rating: 4.4, Reviews: 615, Sales_USD: 22100, Skin_Type: "Normal", Ingredient_Type: "Plant-Based", Launch_Year: 2021, Country: "India" },
+      { Product_ID: 12, Product_Name: "Classic Perfume", Brand: "Elysian", Category: "Fragrance", Price: 55, Rating: 4.6, Reviews: 700, Sales_USD: 44000, Skin_Type: "All Skin Types", Ingredient_Type: "Floral", Launch_Year: 2020, Country: "UAE" },
+      { Product_ID: 13, Product_Name: "Repair Conditioner", Brand: "GlowRoot", Category: "Haircare", Price: 23.5, Rating: 4.3, Reviews: 455, Sales_USD: 18900, Skin_Type: "Dry", Ingredient_Type: "Keratin", Launch_Year: 2022, Country: "India" },
+      { Product_ID: 14, Product_Name: "Matte Lip Tint", Brand: "Velora", Category: "Makeup", Price: 17.2, Rating: 4.5, Reviews: 510, Sales_USD: 16750, Skin_Type: "Oily", Ingredient_Type: "Long-Wear", Launch_Year: 2024, Country: "USA" },
+      { Product_ID: 15, Product_Name: "Brightening Mask", Brand: "AquaBloom", Category: "Skincare", Price: 29.9, Rating: 4.7, Reviews: 860, Sales_USD: 33200, Skin_Type: "Combination", Ingredient_Type: "Niacinamide", Launch_Year: 2023, Country: "Japan" }
+    ];
+
+    let data = fallbackData;
+
+    const brandFilter = document.getElementById('brandFilter');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const skinFilter = document.getElementById('skinFilter');
+    const priceFilter = document.getElementById('priceFilter');
+    const kpis = document.getElementById('kpis');
+    const productTable = document.getElementById('productTable');
+    const recordsTag = document.getElementById('recordsTag');
+    const tableSummary = document.getElementById('tableSummary');
+    const pageInfo = document.getElementById('pageInfo');
+    const prevPage = document.getElementById('prevPage');
+    const nextPage = document.getElementById('nextPage');
+    const insights = document.getElementById('insights');
+    const resetFilters = document.getElementById('resetFilters');
+    const toggleNumbers = document.getElementById('toggleNumbers');
+    const downloadCsv = document.getElementById('downloadCsv');
+    const pageSize = 50;
+    let currentPage = 1;
+    let compactNumbers = true;
+
+    const priceBand = (price) => {
+      if (price < 700) return 'Low';
+      if (price < 2000) return 'Mid';
+      return 'High';
+    };
+
+    const formatMoney = (value) => {
+      const absolute = Math.abs(Number(value) || 0);
+      const sign = Number(value) < 0 ? '-' : '';
+
+      if (!compactNumbers) {
+        return `${sign}₹${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(absolute)}`;
+      }
+
+      const compact = (scaled, suffix) => `${sign}₹${Number(scaled).toFixed(scaled >= 10 ? 0 : 1)}${suffix}`;
+      if (absolute >= 10000000) return compact(absolute / 10000000, 'Cr');
+      if (absolute >= 100000) return compact(absolute / 100000, 'L');
+      if (absolute >= 1000) return compact(absolute / 1000, 'K');
+      return `${sign}₹${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(absolute)}`;
+    };
+    const formatCount = (value) => {
+      const absolute = Math.abs(Number(value) || 0);
+      const sign = Number(value) < 0 ? '-' : '';
+
+      if (!compactNumbers) {
+        return `${sign}${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(absolute)}`;
+      }
+
+      const compact = (scaled, suffix) => `${sign}${Number(scaled).toFixed(scaled >= 10 ? 0 : 1)}${suffix}`;
+      if (absolute >= 10000000) return compact(absolute / 10000000, 'Cr');
+      if (absolute >= 100000) return compact(absolute / 100000, 'L');
+      if (absolute >= 1000) return compact(absolute / 1000, 'K');
+      return `${sign}${new Intl.NumberFormat('en-IN', { maximumFractionDigits: 0 }).format(absolute)}`;
+    };
+    const formatDecimal = (value) => new Intl.NumberFormat('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }).format(value);
+    const uniq = (items) => [...new Set(items)].sort((a, b) => a.localeCompare(b));
+    const getSales = (row) => Number(row.Sales_INR ?? row.Sales_USD ?? 0);
+
+    function makeOptions(select, label, values) {
+      select.innerHTML = `<option value="all">All ${label}</option>` + values.map(value => `<option value="${value}">${value}</option>`).join('');
+    }
+
+    function parseCsvText(text) {
+      const rows = [];
+      let row = [];
+      let cell = '';
+      let inQuotes = false;
+
+      for (let index = 0; index < text.length; index++) {
+        const char = text[index];
+        const next = text[index + 1];
+
+        if (char === '"') {
+          if (inQuotes && next === '"') {
+            cell += '"';
+            index++;
+          } else {
+            inQuotes = !inQuotes;
+          }
+          continue;
+        }
+
+        if (char === ',' && !inQuotes) {
+          row.push(cell);
+          cell = '';
+          continue;
+        }
+
+        if ((char === '\n' || char === '\r') && !inQuotes) {
+          if (char === '\r' && next === '\n') {
+            index++;
+          }
+          if (cell.length || row.length) {
+            row.push(cell);
+            rows.push(row);
+            row = [];
+            cell = '';
+          }
+          continue;
+        }
+
+        cell += char;
+      }
+
+      if (cell.length || row.length) {
+        row.push(cell);
+        rows.push(row);
+      }
+
+      return rows;
+    }
+
+    function csvTextToObjects(text) {
+      const parsedRows = parseCsvText(text.trim());
+      const headers = parsedRows.shift();
+      const numericFields = new Set(['Product_ID', 'Price', 'Rating', 'Reviews', 'Sales_INR', 'Sales_USD', 'Launch_Year']);
+
+      return parsedRows.map(values => {
+        const record = {};
+        headers.forEach((header, index) => {
+          const rawValue = values[index] ?? '';
+          record[header] = numericFields.has(header) ? Number(rawValue) : rawValue;
+        });
+        return record;
+      });
+    }
+
+    async function loadData() {
+      try {
+        const response = await fetch('data/cosmetics_sample.csv', { cache: 'no-store' });
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`);
+        }
+        const text = await response.text();
+        const records = csvTextToObjects(text);
+        if (records.length) {
+          data = records;
+        }
+      } catch (error) {
+        console.warn('Falling back to embedded data.', error);
+        data = fallbackData;
+      }
+    }
+
+    function sum(values) { return values.reduce((a, b) => a + b, 0); }
+    function avg(values) { return values.length ? sum(values) / values.length : 0; }
+
+    function getFiltered() {
+      return data.filter(item => {
+        const byBrand = brandFilter.value === 'all' || item.Brand === brandFilter.value;
+        const byCategory = categoryFilter.value === 'all' || item.Category === categoryFilter.value;
+        const bySkin = skinFilter.value === 'all' || item.Skin_Type === skinFilter.value;
+        const byPrice = priceFilter.value === 'all' || priceBand(item.Price) === priceFilter.value;
+        return byBrand && byCategory && bySkin && byPrice;
+      });
+    }
+
+    function renderKpis(rows) {
+      const totalSales = sum(rows.map(getSales));
+      const avgRating = avg(rows.map(r => r.Rating));
+      const avgPrice = avg(rows.map(r => r.Price));
+      const avgReviews = avg(rows.map(r => r.Reviews));
+      const topBrand = rows.reduce((acc, row) => {
+        acc[row.Brand] = (acc[row.Brand] || 0) + getSales(row);
+        return acc;
+      }, {});
+      const bestBrand = Object.entries(topBrand).sort((a, b) => b[1] - a[1])[0]?.[0] || 'N/A';
+
+      const cards = [
+        { label: 'Products', value: formatCount(rows.length), note: 'Filtered catalog size' },
+        { label: 'Total Sales', value: formatMoney(totalSales), note: 'Sales in INR' },
+        { label: 'Average Rating', value: formatDecimal(avgRating), note: 'Out of 5.0' },
+        { label: 'Average Price', value: formatMoney(avgPrice), note: 'Per product' },
+        { label: 'Average Reviews', value: formatCount(Math.round(avgReviews)), note: 'Customer reviews' },
+        { label: 'Top Brand', value: bestBrand, note: 'Highest sales in view' }
+      ];
+
+      kpis.innerHTML = cards.map((card, index) => `
+        <article class="kpi" style="animation-delay:${index * 60}ms">
+          <div class="kpi-label">${card.label}</div>
+          <div class="kpi-value">${card.value}</div>
+          <div class="kpi-note">${card.note}</div>
+        </article>
+      `).join('');
+
+      [...document.querySelectorAll('.kpi-value')].forEach(node => {
+        node.style.cursor = 'pointer';
+        node.title = 'Click Expand Numbers to switch value format';
+      });
+    }
+
+    function drawBarChart(svg, items, options = {}) {
+      const width = options.width || 760;
+      const height = options.height || 280;
+      const margin = options.margin || { top: 20, right: 30, bottom: 50, left: 120 };
+      const color = options.color || 'var(--accent)';
+      const maxValue = Math.max(...items.map(item => item.value), 1);
+      const chartWidth = width - margin.left - margin.right;
+      const chartHeight = height - margin.top - margin.bottom;
+      const rowHeight = items.length ? chartHeight / items.length : chartHeight;
+      const barHeight = Math.max(18, Math.min(28, rowHeight * 0.6));
+
+      const bars = items.map((item, index) => {
+        const y = margin.top + index * rowHeight + (rowHeight - barHeight) / 2;
+        const barWidth = (item.value / maxValue) * chartWidth;
+        return `
+          <g>
+            <text x="${margin.left - 14}" y="${y + barHeight / 2 + 4}" text-anchor="end" font-size="13" fill="var(--text)" font-weight="600">${item.label}</text>
+            <rect x="${margin.left}" y="${y}" width="${chartWidth}" height="${barHeight}" rx="10" fill="rgba(29,35,47,0.06)" />
+            <rect x="${margin.left}" y="${y}" width="${barWidth}" height="${barHeight}" rx="10" fill="${color}" />
+            <text x="${margin.left + barWidth + 8}" y="${y + barHeight / 2 + 4}" font-size="12" fill="var(--muted)">${item.display}</text>
+          </g>
+        `;
+      }).join('');
+
+      svg.innerHTML = `
+        <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" stroke="rgba(29,35,47,0.18)" />
+        ${bars}
+      `;
+    }
+
+    function drawVerticalBars(svg, items, options = {}) {
+      const width = options.width || 760;
+      const height = options.height || 280;
+      const margin = options.margin || { top: 20, right: 24, bottom: 64, left: 44 };
+      const color = options.color || 'var(--accent-2)';
+      const maxValue = Math.max(...items.map(item => item.value), 1);
+      const chartWidth = width - margin.left - margin.right;
+      const chartHeight = height - margin.top - margin.bottom;
+      const step = chartWidth / items.length;
+      const barWidth = Math.min(92, step * 0.58);
+
+      const bars = items.map((item, index) => {
+        const x = margin.left + index * step + (step - barWidth) / 2;
+        const barHeight = (item.value / maxValue) * chartHeight;
+        const y = margin.top + (chartHeight - barHeight);
+        return `
+          <g>
+            <rect x="${x}" y="${y}" width="${barWidth}" height="${barHeight}" rx="14" fill="${color}" />
+            <text x="${x + barWidth / 2}" y="${y - 8}" text-anchor="middle" font-size="12" fill="var(--muted)" font-weight="700">${item.display}</text>
+            <text x="${x + barWidth / 2}" y="${height - 18}" text-anchor="middle" font-size="12" fill="var(--text)">${item.label}</text>
+          </g>
+        `;
+      }).join('');
+
+      svg.innerHTML = `
+        <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" stroke="rgba(29,35,47,0.18)" />
+        ${bars}
+      `;
+    }
+
+    function drawLineChart(svg, items, options = {}) {
+      const width = options.width || 760;
+      const height = options.height || 300;
+      const margin = options.margin || { top: 24, right: 24, bottom: 48, left: 56 };
+      const color = options.color || 'var(--accent)';
+      const maxValue = Math.max(...items.map(item => item.value), 1);
+      const chartWidth = width - margin.left - margin.right;
+      const chartHeight = height - margin.top - margin.bottom;
+      const step = items.length > 1 ? chartWidth / (items.length - 1) : chartWidth;
+      const points = items.map((item, index) => {
+        const x = margin.left + index * step;
+        const y = margin.top + chartHeight - (item.value / maxValue) * chartHeight;
+        return { x, y, label: item.label, display: item.display };
+      });
+      const path = points.map((point, index) => `${index === 0 ? 'M' : 'L'} ${point.x} ${point.y}`).join(' ');
+      const area = `${path} L ${points.at(-1)?.x || margin.left} ${height - margin.bottom} L ${points[0]?.x || margin.left} ${height - margin.bottom} Z`;
+
+      svg.innerHTML = `
+        <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" stroke="rgba(29,35,47,0.18)" />
+        <path d="${area}" fill="rgba(196,84,61,0.10)" />
+        <path d="${path}" fill="none" stroke="${color}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" />
+        ${points.map(point => `
+          <g>
+            <circle cx="${point.x}" cy="${point.y}" r="6" fill="${color}" />
+            <text x="${point.x}" y="${point.y - 12}" text-anchor="middle" font-size="12" fill="var(--muted)" font-weight="700">${point.display}</text>
+            <text x="${point.x}" y="${height - 18}" text-anchor="middle" font-size="12" fill="var(--text)">${point.label}</text>
+          </g>
+        `).join('')}
+      `;
+    }
+
+    function drawDonutChart(svg, items, options = {}) {
+      const width = options.width || 620;
+      const height = options.height || 300;
+      const cx = 130;
+      const cy = height / 2 - 10;
+      const outer = 78;
+      const inner = 50;
+      const total = Math.max(sum(items.map(item => item.value)), 1);
+      let angle = -Math.PI / 2;
+      const colors = ['var(--accent)', 'var(--accent-2)', 'var(--accent-3)'];
+
+      const slices = items.map((item, index) => {
+        const sweep = (item.value / total) * Math.PI * 2;
+        const start = angle;
+        const end = angle + sweep;
+        angle = end;
+
+        const x1 = cx + outer * Math.cos(start);
+        const y1 = cy + outer * Math.sin(start);
+        const x2 = cx + outer * Math.cos(end);
+        const y2 = cy + outer * Math.sin(end);
+        const ix1 = cx + inner * Math.cos(end);
+        const iy1 = cy + inner * Math.sin(end);
+        const ix2 = cx + inner * Math.cos(start);
+        const iy2 = cy + inner * Math.sin(start);
+        const large = sweep > Math.PI ? 1 : 0;
+        return `
+          <path d="M ${x1} ${y1} A ${outer} ${outer} 0 ${large} 1 ${x2} ${y2} L ${ix1} ${iy1} A ${inner} ${inner} 0 ${large} 0 ${ix2} ${iy2} Z" fill="${colors[index % colors.length]}" opacity="0.95" />
+        `;
+      }).join('');
+
+      const labels = items.map((item, index) => `
+        <g>
+          <rect x="280" y="${24 + index * 42}" width="12" height="12" rx="3" fill="${colors[index % colors.length]}" />
+          <text x="300" y="${34 + index * 42}" font-size="13" fill="var(--text)">${item.label}</text>
+          <text x="560" y="${34 + index * 42}" text-anchor="end" font-size="13" fill="var(--muted)">${item.display}</text>
+        </g>
+      `).join('');
+
+      svg.innerHTML = `
+        ${slices}
+        <circle cx="${cx}" cy="${cy}" r="${inner - 2}" fill="rgba(255,255,255,0.88)" />
+        <text x="${cx}" y="${cy - 2}" text-anchor="middle" font-size="20" font-weight="800" fill="var(--text)">${items.length}</text>
+        <text x="${cx}" y="${cy + 18}" text-anchor="middle" font-size="12" fill="var(--muted)">bands</text>
+        ${labels}
+      `;
+    }
+
+    function renderCharts(rows) {
+      const categoryRows = Object.entries(rows.reduce((acc, row) => {
+        acc[row.Category] = (acc[row.Category] || 0) + 1;
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value, display: formatCount(value) }));
+
+      const brandRows = Object.entries(rows.reduce((acc, row) => {
+        acc[row.Brand] = (acc[row.Brand] || 0) + getSales(row);
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([label, value]) => ({ label, value, display: formatMoney(value) }));
+
+      const skinRows = Object.entries(rows.reduce((acc, row) => {
+        acc[row.Skin_Type] = (acc[row.Skin_Type] || 0) + 1;
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1]).map(([label, value]) => ({ label, value, display: formatCount(value) }));
+
+      const ratingRows = [...rows].sort((a, b) => b.Rating - a.Rating).slice(0, 6).map(row => ({
+        label: row.Product_Name.length > 16 ? `${row.Product_Name.slice(0, 15)}…` : row.Product_Name,
+        value: row.Rating,
+        display: formatDecimal(row.Rating)
+      }));
+
+      drawVerticalBars(document.getElementById('categoryChart'), categoryRows, { color: 'var(--accent)' });
+      drawBarChart(document.getElementById('brandChart'), brandRows, { color: 'var(--accent-2)' });
+      drawBarChart(document.getElementById('skinChart'), skinRows, { color: 'var(--accent-4)', width: 540, height: 300 });
+
+      const ratingSvg = document.getElementById('ratingChart');
+      const width = 540;
+      const height = 300;
+      const margin = { top: 20, right: 30, bottom: 50, left: 120 };
+      const maxValue = 5;
+      const chartWidth = width - margin.left - margin.right;
+      const chartHeight = height - margin.top - margin.bottom;
+      const rowHeight = ratingRows.length ? chartHeight / ratingRows.length : chartHeight;
+      const barHeight = Math.max(18, Math.min(30, rowHeight * 0.64));
+
+      ratingSvg.innerHTML = `
+        <line x1="${margin.left}" y1="${height - margin.bottom}" x2="${width - margin.right}" y2="${height - margin.bottom}" stroke="rgba(29,35,47,0.18)" />
+        ${ratingRows.map((item, index) => {
+          const y = margin.top + index * rowHeight + (rowHeight - barHeight) / 2;
+          const barWidth = (item.value / maxValue) * chartWidth;
+          return `
+            <g>
+              <text x="${margin.left - 14}" y="${y + barHeight / 2 + 4}" text-anchor="end" font-size="13" fill="var(--text)" font-weight="600">${item.label}</text>
+              <rect x="${margin.left}" y="${y}" width="${chartWidth}" height="${barHeight}" rx="10" fill="rgba(29,35,47,0.06)" />
+              <rect x="${margin.left}" y="${y}" width="${barWidth}" height="${barHeight}" rx="10" fill="var(--accent-3)" />
+              <text x="${margin.left + barWidth + 8}" y="${y + barHeight / 2 + 4}" font-size="12" fill="var(--muted)">${item.display}</text>
+            </g>
+          `;
+        }).join('')}
+      `;
+    }
+
+    function renderTable(rows) {
+      const sortedRows = [...rows].sort((a, b) => getSales(b) - getSales(a));
+      const totalPages = Math.max(1, Math.ceil(sortedRows.length / pageSize));
+      currentPage = Math.min(currentPage, totalPages);
+      const startIndex = (currentPage - 1) * pageSize;
+      const pageRows = sortedRows.slice(startIndex, startIndex + pageSize);
+
+      productTable.innerHTML = pageRows.map(row => `
+        <tr>
+          <td><strong>${row.Product_Name}</strong><br><span class="muted">${row.Country}</span></td>
+          <td>${row.Brand}</td>
+          <td>${row.Category}</td>
+          <td>${row.Skin_Type}</td>
+          <td>${formatMoney(row.Price)}</td>
+          <td>${formatDecimal(row.Rating)}</td>
+          <td>${formatMoney(getSales(row))}</td>
+        </tr>
+      `).join('');
+
+      const startNumber = sortedRows.length === 0 ? 0 : startIndex + 1;
+      const endNumber = Math.min(startIndex + pageRows.length, sortedRows.length);
+      tableSummary.textContent = `Showing ${formatCount(startNumber)}-${formatCount(endNumber)} of ${formatCount(sortedRows.length)} tuples`;
+      pageInfo.textContent = `Page ${formatCount(currentPage)} of ${formatCount(totalPages)}`;
+      prevPage.disabled = currentPage === 1;
+      nextPage.disabled = currentPage === totalPages;
+    }
+
+    function renderInsights(rows) {
+      const topCategory = Object.entries(rows.reduce((acc, row) => {
+        acc[row.Category] = (acc[row.Category] || 0) + getSales(row);
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1])[0];
+      const topSkin = Object.entries(rows.reduce((acc, row) => {
+        acc[row.Skin_Type] = (acc[row.Skin_Type] || 0) + 1;
+        return acc;
+      }, {})).sort((a, b) => b[1] - a[1])[0];
+      const premiumCount = rows.filter(row => row.Price >= 35).length;
+
+      const blocks = [
+        {
+          title: 'Best Category',
+          body: topCategory ? `${topCategory[0]} leads with ${formatMoney(topCategory[1])} in sales within the current view.` : 'No data in the current selection.'
+        },
+        {
+          title: 'Leading Skin Segment',
+          body: topSkin ? `${topSkin[0]} appears most often in the filtered set with ${topSkin[1]} products.` : 'No data in the current selection.'
+        },
+        {
+          title: 'Premium Mix',
+          body: `${premiumCount} product${premiumCount === 1 ? '' : 's'} are priced at ₹2,500 or above, showing premium positioning.`
+        }
+      ];
+
+      insights.innerHTML = blocks.map(block => `
+        <article class="insight-card">
+          <h3>${block.title}</h3>
+          <p>${block.body}</p>
+        </article>
+      `).join('');
+    }
+
+    function toCsv(rows) {
+      const headers = ['Product_ID', 'Product_Name', 'Brand', 'Category', 'Price', 'Rating', 'Reviews', 'Sales_INR', 'Skin_Type', 'Ingredient_Type', 'Launch_Year', 'Country'];
+      const escapeCell = (value) => `"${String(value).replaceAll('"', '""')}"`;
+      const lines = [headers.join(',')];
+      rows.forEach(row => {
+        lines.push(headers.map(header => escapeCell(row[header])).join(','));
+      });
+      return lines.join('\n');
+    }
+
+    function update() {
+      currentPage = 1;
+      const filtered = getFiltered();
+      recordsTag.textContent = `${formatCount(filtered.length)} record${filtered.length === 1 ? '' : 's'}`;
+      renderKpis(filtered);
+      renderCharts(filtered);
+      const yearRows = Object.entries(filtered.reduce((acc, row) => {
+        acc[row.Launch_Year] = (acc[row.Launch_Year] || 0) + getSales(row);
+        return acc;
+      }, {})).sort((a, b) => Number(a[0]) - Number(b[0])).map(([label, value]) => ({ label, value, display: formatMoney(value) }));
+      const bandRows = ['Low', 'Mid', 'High'].map(label => ({
+        label,
+        value: filtered.filter(row => priceBand(row.Price) === label).length,
+        display: formatCount(filtered.filter(row => priceBand(row.Price) === label).length)
+      }));
+      drawLineChart(document.getElementById('trendChart'), yearRows, { color: 'var(--accent)' });
+      drawDonutChart(document.getElementById('priceBandChart'), bandRows, { width: 520, height: 300 });
+      renderTable([...filtered].sort((a, b) => getSales(b) - getSales(a)));
+      renderInsights(filtered);
+      toggleNumbers.textContent = compactNumbers ? 'Expand Numbers' : 'Compact Numbers';
+      toggleNumbers.classList.toggle('active', compactNumbers);
+    }
+
+    function init() {
+      makeOptions(brandFilter, 'Brands', uniq(data.map(row => row.Brand)));
+      makeOptions(categoryFilter, 'Categories', uniq(data.map(row => row.Category)));
+      skinFilter.innerHTML = `<option value="all">Any Skin Type</option>` + uniq(data.map(row => row.Skin_Type)).map(value => `<option value="${value}">${value}</option>`).join('');
+      makeOptions(priceFilter, 'Price Bands', ['Low', 'Mid', 'High']);
+
+      [brandFilter, categoryFilter, skinFilter, priceFilter].forEach(control => control.addEventListener('change', update));
+      toggleNumbers.addEventListener('click', () => {
+        compactNumbers = !compactNumbers;
+        update();
+      });
+      prevPage.addEventListener('click', () => {
+        if (currentPage > 1) {
+          currentPage--;
+          renderTable(getFiltered());
+        }
+      });
+      nextPage.addEventListener('click', () => {
+        const filtered = getFiltered();
+        const totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
+        if (currentPage < totalPages) {
+          currentPage++;
+          renderTable(filtered);
+        }
+      });
+      resetFilters.addEventListener('click', () => {
+        brandFilter.value = 'all';
+        categoryFilter.value = 'all';
+        skinFilter.value = 'all';
+        priceFilter.value = 'all';
+        currentPage = 1;
+        update();
+      });
+      downloadCsv.addEventListener('click', () => {
+        const csv = toCsv(getFiltered());
+        const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'cosmetic-insights-filtered.csv';
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        URL.revokeObjectURL(url);
+      });
+      kpis.addEventListener('click', (event) => {
+        if (event.target.closest('.kpi-value')) {
+          toggleNumbers.click();
+        }
+      });
+      update();
+    }
+
+    loadData().then(init);
+  </script>
+</body>
+</html>
