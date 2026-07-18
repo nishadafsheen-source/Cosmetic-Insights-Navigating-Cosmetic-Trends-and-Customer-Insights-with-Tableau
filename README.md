@@ -56,6 +56,6 @@ Identify what customers buy, which brands perform best, how pricing affects dema
 
 The sample dataset included here is illustrative. Replace it with your actual cosmetics dataset before publishing final dashboard results.
 
-## Netlify
+## GitHub Pages
 
-This project is ready to publish on Netlify. The site opens to the dashboard automatically through `index.html` and `netlify.toml`.
+This project is ready to publish on GitHub Pages. The site opens to the dashboard automatically through `index.html`.
